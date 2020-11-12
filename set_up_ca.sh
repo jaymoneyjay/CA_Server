@@ -6,6 +6,22 @@ ROOT_SECRET=$3
 NO_KEY="no_secret"
 DIR=$PWD
 
+SERVER_CERT_PATH="${PWD}/server.cert.pem"
+
+echo "### generate API keys"
+API_KEY=$(python3 api_key_generator.py -l 10)
+API_AUTH=$(python3 api_key_generator.py -l 10)
+
+echo "### setup environment"
+touch .env
+echo "# API Client ID:
+CA_SERVER_CLIENT_AUTH=${API_AUTH}" >> .env
+
+echo "# API Client key:
+CA_SERVER_CLIENT_KEY=${API_KEY}" >> .env
+
+echo "# CA Server Certificate path:
+CA_SERVER_CERT_PATH=${SERVER_CERT_PATH}" >> .env
 
 
 echo "### setup root ca directory"
