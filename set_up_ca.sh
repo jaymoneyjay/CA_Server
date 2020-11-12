@@ -12,6 +12,7 @@ API_KEY=$(python3 api_key_generator.py -l 10)
 API_AUTH=$(python3 api_key_generator.py -l 10)
 
 echo "### setup environment"
+rm .env
 touch .env
 echo "# API Client ID:
 CA_SERVER_CLIENT_AUTH=${API_AUTH}" >> .env

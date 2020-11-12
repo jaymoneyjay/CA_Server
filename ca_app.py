@@ -2,18 +2,29 @@ import flask, base64, enum
 import random, os, json, argparse
 from ca_server import Ca_Server
 
+from OpenSSL import SSL
+from dotenv import load_dotenv, find_dotenv
+
+SERVER_KEY_PATH = "root/server.key.pem"
+SERVER_CERT_PATH = "root/server.cert.pem"
+
+load_dotenv(find_dotenv())
+API_AUTH = os.environ.get("CA_SERVER_CLIENT_AUTH")
+API_KEY = os.environ.get("CA_SERVER_CLIENT_KEY")
 
 class Privilege(enum.Enum):
     NONE = 0
     USER = 1
-    CA = 2
-    SYSTEM = 3
 
 def main(args):
+
     app = flask.Flask(__name__)
     app.config["DEBUG"] = True
     
     ca_server = Ca_Server()
+    print(SERVER_KEY_PATH)
+
+    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
 
 
     #####
@@ -135,10 +146,11 @@ def main(args):
 
         return user_id, user_pw, request_json
 
-    def _authenticate(user_id, user_pw):
-        #TODO: Authenticate with private key of web server
-        # Return highest privilege
-        return Privilege.CA
+    def _authenticate(api_auth, api_key):
+        if api_auth == API_AUTH and api_key == API_KEY:
+            return Privilege.USER
+        else:
+            return Privilege.NONE
 
     def _generate_config(user_id, first_name, last_name, email):
         config = f"""
@@ -278,9 +290,6 @@ def main(args):
         }
         
         return json.dumps(response)
-
-
-    app.run()
 
 
 if __name__ == "__main__":
