@@ -11,7 +11,6 @@ class Ca_Server:
         self.INDEX = os.path.join(self.INTERM, "index.txt")
         self.SERIAL = os.path.join(self.INTERM, "serial")
         
-        self.PW_INTERMEDIATE = "no_secret"
         self.SERIAL_MIN = 4096
 
         self.CERTS = os.path.join(self.INTERM, "certs")
@@ -48,7 +47,7 @@ class Ca_Server:
 
     def _create_crl(self):
         os.system(f"openssl ca -config {self.CONFIG_INTERM} \
-                    -gencrl -passin pass:{self.PW_INTERMEDIATE} -out {self.CRL}")
+                    -gencrl -out {self.CRL}")
 
     def generate_user_certificate(self, user_data):
         user_id = user_data["user_id"]
@@ -82,7 +81,7 @@ class Ca_Server:
         # sign certificate
         os.system(f"openssl ca -batch -config {self.CONFIG_INTERM} \
                     -extensions server_cert -days 375 -notext -md sha256 \
-                    -passin pass:{self.PW_INTERMEDIATE} -in {request_out} \
+                    -in {request_out} \
                     -out {cert_out}")
 
         print("export to pkcs12")
@@ -124,7 +123,6 @@ class Ca_Server:
             return False
 
         os.system(f"openssl ca -config {self.CONFIG_INTERM} \
-                    -passin pass:{self.PW_INTERMEDIATE} \
                     -revoke {crt}")
         
         self._create_crl()
