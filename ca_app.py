@@ -57,7 +57,7 @@ def main(args):
             number_active, number_revoked, serial = ca_server.get_status()
             return _response_status(number_active, number_revoked, serial)
 
-    @app.route('/certificates/serial', methods=['GET'])
+    @app.route('/certificates/serial', methods=['POST'])
     def get_certificate_subject():
         auth_key, auth_secret, args_json = _parse_request(flask.request)
         priv = _authenticate(auth_key, auth_secret)
@@ -74,7 +74,7 @@ def main(args):
             else:
                 return _response_certificates_serial(user_id)
 
-    @app.route('/certificates', methods=['GET'])
+    @app.route('/certificates', methods=['POST'])
     def get_certificates():
         user_id, user_pw, args_json = _parse_request(flask.request)
         priv = _authenticate(user_id, user_pw)
@@ -87,7 +87,7 @@ def main(args):
             certs = ca_server.get_user_certificates_list(user_id)
 
             if certs is None:
-                return _error_not_found()
+                return _response_certificates([])
         
         return _response_certificates(certs)
 
@@ -137,8 +137,8 @@ def main(args):
     def _parse_request(request):
         request_headers = request.headers
 
-        user_id = request_headers["Auth_Key"]
-        user_pw = request_headers["Auth_Pass"]
+        user_id = request_headers["Auth-Key"]
+        user_pw = request_headers["Auth-Pass"]
 
         request_json = request.json
 
@@ -204,11 +204,8 @@ def main(args):
             "status": "ok",
         }
 
-        if len(results) <= 1:
-            response["result"] = results[0]
-        else:
-            response["result_length"] = len(results)
-            response["result"] = results
+        response["result_length"] = len(results)
+        response["result"] = results
         
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
         
@@ -289,7 +286,8 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    # app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    app.run()
 
 
 if __name__ == "__main__":
