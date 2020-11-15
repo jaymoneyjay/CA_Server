@@ -24,8 +24,6 @@ def main(args):
     ca_server = Ca_Server()
     print(SERVER_KEY_PATH)
 
-    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-
 
     #####
     # ROUTING
@@ -191,7 +189,7 @@ def main(args):
                 "current_serial": current_serial
             }
         }
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
     def _response_certificates(certificates):
         results = []
@@ -212,7 +210,7 @@ def main(args):
             response["result_length"] = len(results)
             response["result"] = results
         
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
         
     def _response_issue(firstname, lastname, email, user_id, serial, pkcs12_b64):
         response = {
@@ -231,7 +229,7 @@ def main(args):
             }
         }
 
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
     def _response_revoke(serial):
         response = {
@@ -239,14 +237,14 @@ def main(args):
             "message": f"Certificate {serial} revoked"
         }
         
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
     
     def _response_certificate_status(is_valid):
         response = {
             "status": "ok",
             "valid": is_valid
         }
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
     def _response_certificates_serial(user_id):
         response = {
@@ -254,7 +252,7 @@ def main(args):
             "user_id": user_id
         }
 
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
     #####
     # ERRORS
@@ -265,7 +263,7 @@ def main(args):
             "message": "Unauthorized"
         }
 
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=401, mimetype='application/json')
     
     def _error_forbidden():
         response = {
@@ -273,7 +271,7 @@ def main(args):
             "message": "Forbidden"
         }
 
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=403, mimetype='application/json')
     
     def _error_server_internal():
         response = {
@@ -281,7 +279,7 @@ def main(args):
 	        "message": "Internal Server Error"
         }
 
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=500, mimetype='application/json')
 
     def _error_not_found():
         response = {
@@ -289,7 +287,9 @@ def main(args):
 	        "message": "Not found"
         }
         
-        return json.dumps(response)
+        return flask.Response(json.dumps(response), status=404, mimetype='application/json')
+
+    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
 
 
 if __name__ == "__main__":
