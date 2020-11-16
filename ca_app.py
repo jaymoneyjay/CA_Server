@@ -196,7 +196,8 @@ def main(args):
         for cert in certificates:
             result = {
                 "serial": cert[0],
-                "fingerprint": cert[1]
+                "fingerprint": cert[1],
+                "valid": cert[2]
             }
             results.append(result)
         

@@ -126,7 +126,6 @@ class Ca_Server:
                     -revoke {crt}")
         
         self._create_crl()
-        # TODO: get and return true status of cert
 
         return True
 
@@ -173,21 +172,41 @@ class Ca_Server:
 
     def get_user_certificates_list(self, user_id):
         users_certs_list = []
-        user_certs = self.get_user_certificates(user_id)
+        user_certs = self.get_user_certificates_with_status(user_id)
         
         if user_certs is None:
             return None
 
-        for user_cert in user_certs:
-            #cert_path = os.path.join(self.CERTS, user_cert)
-            fingerprint = os.popen(f"openssl x509 -in {user_cert} -noout -fingerprint -sha256").read().strip("\n")
+        for cert_triple in user_certs:
+            serial_number = cert_triple[0]
+            user_id = cert_triple[1]
+            status = cert_triple[2]
+            cert_name = serial_number + "@" + user_id + ".cert.pem"
+            cert_path = os.path.join(self.CERTS, cert_name)
+            fingerprint = os.popen(f"openssl x509 -in {cert_path} -noout -fingerprint -sha256").read().strip("\n")
             fingerprint = fingerprint.replace("Fingerprint=", "")
-            basename = os.path.basename(user_cert)
-            serial_number = basename.split("@")[0]
-            users_certs_list.append((serial_number, fingerprint))
+            users_certs_list.append((serial_number, fingerprint, status))
         return users_certs_list
 
-    #def get_user_certificates_with_status(self, user_id):
+    def get_user_certificates_with_status(self, user_id):
+        certs = self.get_all_certificates_with_status()
+        user_certs = [cert for cert in certs if cert[1] == user_id]
+        return user_certs
+
+    def get_all_certificates_with_status(self):
+        index_txt = os.popen(f"cat {self.INDEX}").readlines()
+        certs = []
+        user_delimiter = "/OU="
+        for line in index_txt:
+            if user_delimiter in line:
+                status_str = line[0]
+                status = (status_str == "V")
+                user_id = line.split(user_delimiter, 1)[1].split("/")[0]
+                serial_number = line.split("\t")[3]
+                certs.append((serial_number, user_id, status))
+        return certs
+
+
             
 
 
