@@ -287,8 +287,8 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    # app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-    app.run()
+    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    #app.run()
 
 
 if __name__ == "__main__":
