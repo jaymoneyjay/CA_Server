@@ -1,5 +1,5 @@
 import flask, base64, enum
-import random, os, json, argparse
+import random, os, json, argparse, logging
 from ca_server import Ca_Server
 
 from OpenSSL import SSL
@@ -20,6 +20,7 @@ def main(args):
 
     app = flask.Flask(__name__)
     app.config["DEBUG"] = True
+    logging.basicConfig(filename='ca_service.log', format='%(asctime)s %(message)s', level=logging.INFO)
     
     ca_server = Ca_Server()
     print(SERVER_KEY_PATH)
@@ -34,8 +35,9 @@ def main(args):
 
     @app.route('/certificates/verify', methods=['POST'])
     def verify_certificate():
-        auth_key, auth_secret, args_json = _parse_request(flask.request)
-        priv = _authenticate(auth_key, auth_secret)
+        auth_key, auth_pass, args_json = _parse_request(flask.request)
+
+        priv = _authenticate(auth_key, auth_pass)
 
         if priv == Privilege.NONE:
             return _error_forbidden()
@@ -48,19 +50,20 @@ def main(args):
 
     @app.route('/certificates/status', methods=['GET'])
     def get_status():
-        auth_key, auth_secret, _ = _parse_request(flask.request)
-        priv = _authenticate(auth_key, auth_secret)
+        auth_key, auth_pass, _ = _parse_request(flask.request)
+        priv = _authenticate(auth_key, auth_pass)
 
         if priv == Privilege.NONE:
             return _error_forbidden()
         else:
             number_active, number_revoked, serial = ca_server.get_status()
+
             return _response_status(number_active, number_revoked, serial)
 
     @app.route('/certificates/serial', methods=['POST'])
     def get_certificate_subject():
-        auth_key, auth_secret, args_json = _parse_request(flask.request)
-        priv = _authenticate(auth_key, auth_secret)
+        auth_key, auth_pass, args_json = _parse_request(flask.request)
+        priv = _authenticate(auth_key, auth_pass)
         
         if priv == Privilege.NONE:
             return _error_forbidden()
@@ -72,12 +75,13 @@ def main(args):
             if user_id is None:
                 return _error_not_found()
             else:
-                return _response_certificates_serial(user_id)
+                return _response_certificates_serial(user_id, serial_number
+                )
 
     @app.route('/certificates', methods=['POST'])
     def get_certificates():
-        user_id, user_pw, args_json = _parse_request(flask.request)
-        priv = _authenticate(user_id, user_pw)
+        auth_key, auth_pass, args_json = _parse_request(flask.request)
+        priv = _authenticate(auth_key, auth_pass)
 
         if priv == Privilege.NONE:
             return _error_forbidden()
@@ -87,9 +91,9 @@ def main(args):
             certs = ca_server.get_user_certificates_list(user_id)
 
             if certs is None:
-                return _response_certificates([])
+                return _response_certificates([], user_id)
         
-        return _response_certificates(certs)
+        return _response_certificates(certs, user_id)
 
     @app.route('/certificates/issue', methods=['POST'])
     def issue_certificate():
@@ -129,9 +133,18 @@ def main(args):
             else:
                 return _error_not_found()
 
-    @app.route('/intermediate.crl.pem', methods=['GET'])
+    @app.route('/certificates/crl', methods=['GET'])
     def get_crl():
-        return ca_server.get_crl()
+        auth_key, auth_pass, _ = _parse_request(flask.request)
+        priv = _authenticate(auth_key, auth_pass)
+
+        if priv == Privilege.NONE:
+            return _error_forbidden()
+        else:
+
+            crl = ca_server.get_crl()
+            crl_64 = base64.b64encode(crl.encode("ascii")).decode("ascii")
+            return _response_crl(crl_64)
 
 
     def _parse_request(request):
@@ -139,6 +152,8 @@ def main(args):
 
         user_id = request_headers["Auth-Key"]
         user_pw = request_headers["Auth-Pass"]
+
+        logging.info(f"Request from {user_id}")
 
         request_json = request.json
 
@@ -180,6 +195,17 @@ def main(args):
     #####
     # RESPONSES
     #####
+    
+    def _response_crl(crl_64):
+        response = {
+            "status": "ok",
+            "crl64": crl_64
+        }
+
+        logging.info(f"Status ok. Responded with crl in base64.")
+
+        return flask.Response(json.dumps(response), status=200, mimetype='application/json')
+
     def _response_status(number_active, number_revoked, current_serial):
         response = {
             "status": "ok",
@@ -189,9 +215,12 @@ def main(args):
                 "current_serial": current_serial
             }
         }
+
+        logging.info(f"Status ok. Responded with active: {number_active}, revoked: {number_revoked}, current serial: {current_serial}")
+
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
-    def _response_certificates(certificates):
+    def _response_certificates(certificates, user_id):
         results = []
         for cert in certificates:
             result = {
@@ -207,6 +236,8 @@ def main(args):
 
         response["result_length"] = len(results)
         response["result"] = results
+
+        logging.info(f"Status ok. Responded with list of user certificates of user {user_id}.")
         
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
         
@@ -227,6 +258,8 @@ def main(args):
             }
         }
 
+        logging.info(f"Status ok. Certificate {serial}.p12 generated successfully for user {user_id}.")
+
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
     def _response_revoke(serial):
@@ -234,6 +267,8 @@ def main(args):
             "status": "ok",
             "message": f"Certificate {serial} revoked"
         }
+
+        logging.info(f"Status ok. Certificate {serial}.p12 successfully revoked.")
         
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
     
@@ -242,13 +277,18 @@ def main(args):
             "status": "ok",
             "valid": is_valid
         }
+
+        logging.info(f"Status ok. Responded with certificate revoked status.  Valid: {is_valid}")
+
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
-    def _response_certificates_serial(user_id):
+    def _response_certificates_serial(user_id, serial_number):
         response = {
             "status": "ok",
             "user_id": user_id
         }
+
+        logging.info(f"Status ok. Responded with user id corresponding to certificate {serial_number}.p12: user_id")
 
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 
@@ -261,6 +301,8 @@ def main(args):
             "message": "Unauthorized"
         }
 
+        logging.info(f"Status error: 401 unauthorized")
+
         return flask.Response(json.dumps(response), status=401, mimetype='application/json')
     
     def _error_forbidden():
@@ -268,6 +310,8 @@ def main(args):
             "status": "error",
             "message": "Forbidden"
         }
+
+        logging.info(f"Status error: 403 forbidden")
 
         return flask.Response(json.dumps(response), status=403, mimetype='application/json')
     
@@ -277,6 +321,8 @@ def main(args):
 	        "message": "Internal Server Error"
         }
 
+        logging.info(f"Status error: 500 internal server error")
+
         return flask.Response(json.dumps(response), status=500, mimetype='application/json')
 
     def _error_not_found():
@@ -284,6 +330,8 @@ def main(args):
             "status": "error",
 	        "message": "Not found"
         }
+
+        logging.info(f"Status error: 404 not found")
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
