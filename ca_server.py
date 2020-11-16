@@ -186,6 +186,8 @@ class Ca_Server:
             serial_number = basename.split("@")[0]
             users_certs_list.append((serial_number, fingerprint))
         return users_certs_list
+
+    #def get_user_certificates_with_status(self, user_id):
             
 
 

@@ -57,7 +57,7 @@ def main(args):
             number_active, number_revoked, serial = ca_server.get_status()
             return _response_status(number_active, number_revoked, serial)
 
-    @app.route('/certificates/serial', methods=['GET'])
+    @app.route('/certificates/serial', methods=['POST'])
     def get_certificate_subject():
         auth_key, auth_secret, args_json = _parse_request(flask.request)
         priv = _authenticate(auth_key, auth_secret)
@@ -74,7 +74,7 @@ def main(args):
             else:
                 return _response_certificates_serial(user_id)
 
-    @app.route('/certificates', methods=['GET'])
+    @app.route('/certificates', methods=['POST'])
     def get_certificates():
         user_id, user_pw, args_json = _parse_request(flask.request)
         priv = _authenticate(user_id, user_pw)
