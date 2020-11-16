@@ -87,7 +87,7 @@ def main(args):
             certs = ca_server.get_user_certificates_list(user_id)
 
             if certs is None:
-                return _error_not_found()
+                return _response_certificates([])
         
         return _response_certificates(certs)
 
@@ -137,8 +137,8 @@ def main(args):
     def _parse_request(request):
         request_headers = request.headers
 
-        user_id = request_headers["Auth_Key"]
-        user_pw = request_headers["Auth_Pass"]
+        user_id = request_headers["Auth-Key"]
+        user_pw = request_headers["Auth-Pass"]
 
         request_json = request.json
 
@@ -205,11 +205,8 @@ def main(args):
             "status": "ok",
         }
 
-        if len(results) <= 1:
-            response["result"] = results[0]
-        else:
-            response["result_length"] = len(results)
-            response["result"] = results
+        response["result_length"] = len(results)
+        response["result"] = results
         
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
         
@@ -290,7 +287,8 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    # app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    app.run()
 
 
 if __name__ == "__main__":
