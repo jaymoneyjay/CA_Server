@@ -31,7 +31,7 @@ def main(args):
     #####
     @app.route('/', methods=['GET'])
     def home():
-        return "<h1>Distant Reading Archive</h1><p>This site is a prototype API for distant reading of science fiction novels.</p>"
+        return "<h1>iMovies PKI API Server</p>"
 
     @app.route('/certificates/verify', methods=['POST'])
     def verify_certificate():
@@ -335,8 +335,8 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    app.run(ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-    #app.run()
+    #app.run(host="0.0.0.0", port="5000", ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    app.run(host="0.0.0.0", port="5000")
 
 
 if __name__ == "__main__":
