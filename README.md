@@ -14,6 +14,15 @@ First set up the chain of trust by running the following command. As SECRET you 
 ./set_up_ca.sh root.cnf intermediate.cnf <SECRET>
 ```
 
+This createds a hidden file $\texttt{.env}$ which contains an $\texttt{api-key}$ and $\texttt{api-pass}$ both of which have to be included in $\texttt{https}$ headers to authenticate successfully to the API:
+
+```bash
+Auth_Key: <<api-key>>
+Auth_Pass: <<api-pass>>
+Content-Type: application/json
+```
+
+
 Start the API with the following command
 
 ```bash
