@@ -5,7 +5,9 @@ INTERMEDIATE_CA_CONFIG=$2
 ROOT_SECRET=$3
 DIR=$PWD
 
-SERVER_CERT_PATH="${PWD}/server.cert.pem"
+CA_SERVER_CERT_PATH="${PWD}/ca_server.cert.pem"
+WEB_SERVER_CERT_PATH="${PWD}/web_server.cert.pem"
+
 
 echo "### generate API keys"
 API_KEY=$(python3 api_key_generator.py -l 10)
@@ -21,7 +23,10 @@ echo "# API Client key:
 CA_SERVER_CLIENT_KEY=${API_KEY}" >> .env
 
 echo "# CA Server Certificate path:
-CA_SERVER_CERT_PATH=${SERVER_CERT_PATH}" >> .env
+CA_SERVER_CERT_PATH=${CA_SERVER_CERT_PATH}" >> .env
+
+echo "# Web Server Certificate path:
+WEB_SERVER_CERT_PATH=${WEB_SERVER_CERT_PATH}" >> .env
 
 
 echo "### setup root ca directory"
@@ -92,19 +97,35 @@ cat intermediate/certs/intermediate.cert.pem \
 
 echo "### Generate CA Server certificate"
 # Generate key pair
-openssl genrsa -out "${PWD}/server.key.pem" 2048
+openssl genrsa -out "${PWD}/ca_server.key.pem" 2048
 
 # Generate certificate request
 openssl req -config intermediate/openssl.cnf \
-            -key "${PWD}/server.key.pem"\
-            -new -sha256 -subj '/CN=CA Server/O=iMovies/C=CH/ST=Zurich/L=Zurich' \
-            -out "${PWD}/server.csr.pem"
+            -key "${PWD}/ca_server.key.pem"\
+            -new -sha256 -subj '/CN=ca.imovies.ch/O=iMovies/C=CH/ST=Zurich/L=Zurich' \
+            -out "${PWD}/ca_server.csr.pem"
 
 # sign certificate
 openssl ca -batch -config intermediate/openssl.cnf \
             -extensions server_cert -days 375 -notext -md sha256 \
-            -passin pass:$NO_KEY -in "${PWD}/server.csr.pem" \
-            -out "${PWD}/server.cert.pem"
+            -in "${PWD}/ca_server.csr.pem" \
+            -out "${PWD}/ca_server.cert.pem"
+
+echo "### Generate Web Server certificate"
+# Generate key pair
+openssl genrsa -out "${PWD}/web_server.key.pem" 2048
+
+# Generate certificate request
+openssl req -config intermediate/openssl.cnf \
+            -key "${PWD}/web_server.key.pem"\
+            -new -sha256 -subj '/CN=imovies.ch/O=iMovies/C=CH/ST=Zurich/L=Zurich' \
+            -out "${PWD}/web_server.csr.pem"
+
+# sign certificate
+openssl ca -batch -config intermediate/openssl.cnf \
+            -extensions server_cert -days 375 -notext -md sha256 \
+            -in "${PWD}/web_server.csr.pem" \
+            -out "${PWD}/web_server.cert.pem"
 
 
 echo " ### Remove root key from server"

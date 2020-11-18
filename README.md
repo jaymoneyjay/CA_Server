@@ -22,6 +22,16 @@ Auth_Pass: <<api-pass>>
 Content-Type: application/json
 ```
 
+The certificates for the CA server and the Web server are created automatically.
+The respective paths can be found in the .env file:
+
+ ```bash
+ # CA Server Certificate path:
+CA_SERVER_CERT_PATH=<<cert path>>
+# Web Server Certificate path:
+WEB_SERVER_CERT_PATH=<<cert path>>
+ ```
+
 
 Start the API with the following command
 
