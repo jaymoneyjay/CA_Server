@@ -44,10 +44,10 @@ def main(args):
         else:
             cert_b64 = args_json["cert"]["base64"]
             cert = base64.b64decode(cert_b64)
-            is_valid = ca_server.verify_certificate(cert)
+            is_valid, user_id = ca_server.verify_certificate(cert)
             
             #TODO return user name
-            return _response_certificate_status(is_valid)
+            return _response_certificate_status(is_valid, user_id)
 
     @app.route('/certificates/status', methods=['POST'])
     def get_status():
@@ -273,13 +273,14 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
     
-    def _response_certificate_status(is_valid):
+    def _response_certificate_status(is_valid, user_id):
         response = {
             "status": "ok",
-            "valid": is_valid
+            "valid": is_valid,
+            "user_id": user_id
         }
 
-        logging.info(f"Status ok. Responded with certificate revoked status.  Valid: {is_valid}")
+        logging.info(f"Status ok. Responded with certificate revoked status.  Valid: {is_valid}, for user {user_id}")
 
         return flask.Response(json.dumps(response), status=200, mimetype='application/json')
 

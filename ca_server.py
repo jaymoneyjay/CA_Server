@@ -154,13 +154,16 @@ class Ca_Server:
         with open(cert_path, "wb") as f:
             f.write(cert)
         # update crl chain list
+        _ = self.get_crl()
         os.system(f"cat {self.CHAIN} {self.CRL} > {self.VERIFY}")
         response = os.popen(f"openssl verify -crl_check -CAfile {self.VERIFY} {cert_path}").read()
+        user_id = os.popen(f"openssl x509 -noout -subject -nameopt multiline -in {cert_path} | sed -n 's/organizationalUnitName[^=]*=//p'").read()
+        user_id = user_id.strip()
         os.remove(cert_path)
         if response.endswith("OK\n"):
-            return True
+            return True, user_id
         else:
-            return False
+            return False, ""
 
     def get_certificate_subject(self, serial_number):
         cert_path = self._find_cert(serial_number)
