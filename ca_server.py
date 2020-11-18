@@ -53,8 +53,8 @@ class Ca_Server:
         user_id = user_data["user_id"]
         email = user_data["email"]
         password = user_data["password"]
-        first_name = user_data["firstname"]
-        last_name = user_data["lastname"]
+        first_name = user_data["firstname"].replace(" ", "")
+        last_name = user_data["lastname"].replace(" ", "")
         
         # Read serial in HEX
         serial = self._get_current_serial()
