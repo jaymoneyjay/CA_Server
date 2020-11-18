@@ -45,7 +45,8 @@ def main(args):
             cert_b64 = args_json["cert"]["base64"]
             cert = base64.b64decode(cert_b64)
             is_valid = ca_server.verify_certificate(cert)
-
+            
+            #TODO return user name
             return _response_certificate_status(is_valid)
 
     @app.route('/certificates/status', methods=['GET'])

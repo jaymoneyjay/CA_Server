@@ -186,7 +186,6 @@ class Ca_Server:
             fingerprint = os.popen(f"openssl x509 -in {cert_path} -noout -fingerprint -sha256").read().strip("\n")
             fingerprint = fingerprint.replace("Fingerprint=", "")
             users_certs_list.append((serial_number, fingerprint, status))
-        return users_certs_list
 
     def get_user_certificates_with_status(self, user_id):
         certs = self.get_all_certificates_with_status()
