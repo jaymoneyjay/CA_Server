@@ -49,7 +49,7 @@ def main(args):
             #TODO return user name
             return _response_certificate_status(is_valid)
 
-    @app.route('/certificates/status', methods=['GET'])
+    @app.route('/certificates/status', methods=['POST'])
     def get_status():
         auth_key, auth_pass, _ = _parse_request(flask.request)
         priv = _authenticate(auth_key, auth_pass)
@@ -134,7 +134,7 @@ def main(args):
             else:
                 return _error_not_found()
 
-    @app.route('/certificates/crl', methods=['GET'])
+    @app.route('/certificates/crl', methods=['POST'])
     def get_crl():
         auth_key, auth_pass, _ = _parse_request(flask.request)
         priv = _authenticate(auth_key, auth_pass)
@@ -332,12 +332,12 @@ def main(args):
 	        "message": "Not found"
         }
 
-        logging.info(f"Status error: 404 not found")
+        logging.info(f"Status error: 404 Not found")
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
     #app.run(host="0.0.0.0", port="5000", ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port=5000)
 
 
 if __name__ == "__main__":
