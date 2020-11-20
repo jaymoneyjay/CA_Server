@@ -5,8 +5,8 @@ from ca_server import Ca_Server
 from OpenSSL import SSL
 from dotenv import load_dotenv, find_dotenv
 
-SERVER_KEY_PATH = "root/server.key.pem"
-SERVER_CERT_PATH = "root/server.cert.pem"
+SERVER_KEY_PATH = "ca_server.key.pem"
+SERVER_CERT_PATH = "ca_server.cert.pem"
 
 load_dotenv(find_dotenv())
 API_AUTH = os.environ.get("CA_SERVER_CLIENT_AUTH")
@@ -337,8 +337,8 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    #app.run(host="0.0.0.0", port="5000", ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
+    #app.run(host="0.0.0.0", port=5000)
 
 
 if __name__ == "__main__":

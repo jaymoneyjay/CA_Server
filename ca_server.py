@@ -190,6 +190,8 @@ class Ca_Server:
             fingerprint = fingerprint.replace("Fingerprint=", "")
             users_certs_list.append((serial_number, fingerprint, status))
 
+        return users_certs_list
+
     def get_user_certificates_with_status(self, user_id):
         certs = self.get_all_certificates_with_status()
         user_certs = [cert for cert in certs if cert[1] == user_id]
