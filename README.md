@@ -26,8 +26,8 @@ Create a `.env` file in the app's root directory with the following contents (wi
  ```bash
 LISTEN="0.0.0.0"
 PORT=5000
-SSL_KEY_FILE="ssl.key.pem"
-SSL_CERT_FILE="ssl.cert.pem"
+SSL_KEY_FILE="caserver.key.pem"
+SSL_CERT_FILE="caserver.cert.pem"
 LOGFILE="ca_server.log"
 API_CLIENT_KEY="<API_CLIENT_KEY>"
 API_CLIENT_PASS="<API_CLIENT_PASS>"
