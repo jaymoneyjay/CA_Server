@@ -11,22 +11,16 @@ WEB_SERVER_CERT_PATH="${PWD}/web_server.cert.pem"
 
 echo "### generate API keys"
 API_KEY=$(python3 api_key_generator.py -l 10)
-API_AUTH=$(python3 api_key_generator.py -l 10)
+API_PASS=$(python3 api_key_generator.py -l 10)
 
 echo "### setup environment"
-rm .env
-touch .env
-echo "# API Client ID:
-CA_SERVER_CLIENT_AUTH=${API_AUTH}" >> .env
+# delete old keys
+sed -i '' '/API_CLIENT_KEY=.*/d' .env
+sed -i '' '/API_CLIENT_PASS=.*/d' .env
 
-echo "# API Client key:
-CA_SERVER_CLIENT_KEY=${API_KEY}" >> .env
-
-echo "# CA Server Certificate path:
-CA_SERVER_CERT_PATH=${CA_SERVER_CERT_PATH}" >> .env
-
-echo "# Web Server Certificate path:
-WEB_SERVER_CERT_PATH=${WEB_SERVER_CERT_PATH}" >> .env
+# write new keys
+echo "API_CLIENT_KEY=${API_KEY}" >> .env
+echo "API_CLIENT_PASS=${API_PASS}" >> .env
 
 
 echo "### setup root ca directory"

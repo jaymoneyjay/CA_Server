@@ -2,4 +2,4 @@
 .env
 __pycache__
 root
-ca_service.log
+ca_server.log
