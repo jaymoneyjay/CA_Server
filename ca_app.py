@@ -46,7 +46,6 @@ def main(args):
             cert = base64.b64decode(cert_b64)
             is_valid, user_id = ca_server.verify_certificate(cert)
             
-            #TODO return user name
             return _response_certificate_status(is_valid, user_id)
 
     @app.route('/certificates/status', methods=['POST'])
