@@ -5,12 +5,7 @@ from ca_server import Ca_Server
 from OpenSSL import SSL
 from dotenv import load_dotenv, find_dotenv
 
-SERVER_KEY_PATH = "root/server.key.pem"
-SERVER_CERT_PATH = "root/server.cert.pem"
-
 load_dotenv(find_dotenv())
-API_AUTH = os.environ.get("CA_SERVER_CLIENT_AUTH")
-API_KEY = os.environ.get("CA_SERVER_CLIENT_KEY")
 
 class Privilege(enum.Enum):
     NONE = 0
@@ -20,18 +15,16 @@ def main(args):
 
     app = flask.Flask(__name__)
     app.config["DEBUG"] = True
-    logging.basicConfig(filename='ca_service.log', format='%(asctime)s %(message)s', level=logging.INFO)
+    logging.basicConfig(filename=os.environ.get("LOGFILE"), format='%(asctime)s %(message)s', level=logging.INFO)
     
     ca_server = Ca_Server()
-    print(SERVER_KEY_PATH)
-
 
     #####
     # ROUTING
     #####
     @app.route('/', methods=['GET'])
     def home():
-        return "<h1>iMovies PKI API Server</p>"
+        return flask.Response(json.dumps({status: "OK"}), status=200, mimetype='application/json')
 
     @app.route('/certificates/verify', methods=['POST'])
     def verify_certificate():
@@ -159,8 +152,8 @@ def main(args):
 
         return user_id, user_pw, request_json
 
-    def _authenticate(api_auth, api_key):
-        if api_auth == API_AUTH and api_key == API_KEY:
+    def _authenticate(api_key, api_pass):
+        if api_key == os.environ.get("API_CLIENT_KEY") and api_pass == os.environ.get("API_CLIENT_PASS"):
             return Privilege.USER
         else:
             return Privilege.NONE
@@ -336,8 +329,7 @@ def main(args):
         
         return flask.Response(json.dumps(response), status=404, mimetype='application/json')
 
-    #app.run(host="0.0.0.0", port="5000", ssl_context=(SERVER_CERT_PATH, SERVER_KEY_PATH))
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host=os.environ.get("LISTEN"), port=os.environ.get("PORT"), ssl_context=(os.environ.get("SSL_CERT_FILE"), os.environ.get("SSL_KEY_FILE")))
 
 
 if __name__ == "__main__":
