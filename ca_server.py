@@ -22,10 +22,6 @@ class Ca_Server:
 
     
     def _find_cert(self, serial_number):
-        # if not self._is_serial(serial_number):
-        #     return None
-        # serial_number = hex(serial_number).strip("0x")
-
         certs = self.get_all_certificates()
         for cert in certs:
             cert_name = os.path.basename(cert)
@@ -207,97 +203,3 @@ class Ca_Server:
                 serial_number = line.split("\t")[3]
                 certs.append((serial_number, user_id, status))
         return certs
-
-
-            
-
-
-
-
-
-user_data = {
-    "firstname": "Samuel",
-    "lastname": "Waeny",
-    "password": "test",
-    "email": "waeny@imovies.ch",
-    "user_id": "waeny"
-}
-cert_rev = """
------BEGIN CERTIFICATE-----
-"; echo "I am a malicious command"; echo "-----BEGIN CERTIFICATE-----
-MIIFnTCCA4WgAwIBAgICEBYwDQYJKoZIhvcNAQELBQAwSjELMAkGA1UEBhMCQ0gx
-DzANBgNVBAgMBlp1cmljaDEQMA4GA1UECgwHaU1vdmllczEYMBYGA1UEAwwPSW50
-ZXJtZWRpYXRlIENBMB4XDTIwMTEwMzEyNTY1OFoXDTIxMTExMzEyNTY1OFowfzEL
-MAkGA1UEBhMCQ0gxDzANBgNVBAgMBlp1cmljaDEPMA0GA1UEBwwGWnVyaWNoMRAw
-DgYDVQQKDAdpTW92aWVzMQ4wDAYDVQQLDAV3YWVueTENMAsGA1UEAwwEMTAxNjEd
-MBsGCSqGSIb3DQEJARYOd2FlbnlzQGV0aHouY2gwggEiMA0GCSqGSIb3DQEBAQUA
-A4IBDwAwggEKAoIBAQDpCz5HOXrGbYCHJqowxZlxoLU/lIV6TyCHKbs9te6xjZr8
-1WRXga2trS5GsqDis+mGAkPyaXs6hFCJEFMB09u8OW69vFRBKOun6XVR33HDWvc1
-MY7KyzbqkW+0HFEkg4OmkWAWFcQpbD97kuLVaSFsz1ZQn4J/yPPI583fU9h+dxbJ
-sKx7weQjo4L2dg68qoyCWbZnNi+xsNEoL6rIBcytSe9RSumDgMyRMaqh35hMhZtW
-2rbBjNdc66FSiI6tK7jcD6xxGBUokOMLAEYmsO0zhAG6AZmO3D5KkW0qmymXJ3U2
-xqrzlHVhErEOo2vbUlMDUfphoditWS9IQKNCso7pAgMBAAGjggFWMIIBUjAJBgNV
-HRMEAjAAMBEGCWCGSAGG+EIBAQQEAwIGQDAzBglghkgBhvhCAQ0EJhYkT3BlblNT
-TCBHZW5lcmF0ZWQgU2VydmVyIENlcnRpZmljYXRlMB0GA1UdDgQWBBRA5HOWNIhD
-XkdfpGLagJJ0zs2yBTB8BgNVHSMEdTBzgBRHWyJnNZkcrJiaP6t6lNTZUyOCD6FX
-pFUwUzEQMA4GA1UEAwwHUm9vdCBDQTEQMA4GA1UECgwHaU1vdmllczELMAkGA1UE
-BhMCQ0gxDzANBgNVBAgMBlp1cmljaDEPMA0GA1UEBwwGWnVyaWNoggIQADAOBgNV
-HQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwOwYDVR0fBDQwMjAwoC6g
-LIYqaHR0cDovLzEyNy4wLjAuMTo1MDAwL2ludGVybWVkaWF0ZS5jcmwucGVtMA0G
-CSqGSIb3DQEBCwUAA4ICAQCD07+65HF4kZE4T+GroY/ZDD7Zt73rvqko6i0Im2/Q
-cFuvjajw0t5cDnY9ayKb09dByiKABPMDl5CEObDHAG2LklcXIeBunAAAKXy6AtLd
-R7u+ODA0IjBMCxlHnLTeeeAJo7Dv8f+IfDmgyHTlURUBs2t82kYveg8arIvWtgLP
-LDd2JPnX3Jg70YHy4yc+W71Z4jfjQbbGLHOfGRDYccIEy5K2emwidT4EtiauTgob
-VfS01nnmqXRymrSzWI9n6qNzgBm16yDbaa+pEhWO0ha287jL+vgbLGPH5Re6qMGd
-lC5NiXRQQfKU+LYmhWrbgUh5RSEYXxJVsq8x45Yk3CLqfQOvUUC8vUKTLaYpDHTg
-nzPDyOH3zaHTaagDocvxZ/U6bE1v0tujZo9mC+er3u9TK2pC0ty9kjCc/QeEiSVv
-m2KXKCWhSjGsqOXj/1vcUAop6LbYSjKh0/NHCugrNNvgqIkF5Wb2ZgYJ9ng5ix8k
-d9WW73fGeg3dKmI4ktUnNN8or1iB2Ghz4ohDp4CDpF5zLaUs2oLicA94vp3wg3vF
-LjNyDGNcBwlC0ClSvGouv5TQ+AJdfUKeeWnxNx8okGrA0CY4+tiQFLQD3s/WmbDp
-7R1OxgWDMmknqLikG58lc/hkNkAh6A0aoXkBUL9dH/Qr0EUGwgWfgsYnjM9+oSzd
-CQ==
------END CERTIFICATE-----
-"""
-cert_valid = """
------BEGIN CERTIFICATE-----
-MIIFnTCCA4WgAwIBAgICEBYwDQYJKoZIhvcNAQELBQAwSjELMAkGA1UEBhMCQ0gx
-DzANBgNVBAgMBlp1cmljaDEQMA4GA1UECgwHaU1vdmllczEYMBYGA1UEAwwPSW50
-ZXJtZWRpYXRlIENBMB4XDTIwMTEwMzEyNTY1OFoXDTIxMTExMzEyNTY1OFowfzEL
-MAkGA1UEBhMCQ0gxDzANBgNVBAgMBlp1cmljaDEPMA0GA1UEBwwGWnVyaWNoMRAw
-DgYDVQQKDAdpTW92aWVzMQ4wDAYDVQQLDAV3YWVueTENMAsGA1UEAwwEMTAxNjEd
-MBsGCSqGSIb3DQEJARYOd2FlbnlzQGV0aHouY2gwggEiMA0GCSqGSIb3DQEBAQUA
-A4IBDwAwggEKAoIBAQDpCz5HOXrGbYCHJqowxZlxoLU/lIV6TyCHKbs9te6xjZr8
-1WRXga2trS5GsqDis+mGAkPyaXs6hFCJEFMB09u8OW69vFRBKOun6XVR33HDWvc1
-MY7KyzbqkW+0HFEkg4OmkWAWFcQpbD97kuLVaSFsz1ZQn4J/yPPI583fU9h+dxbJ
-sKx7weQjo4L2dg68qoyCWbZnNi+xsNEoL6rIBcytSe9RSumDgMyRMaqh35hMhZtW
-2rbBjNdc66FSiI6tK7jcD6xxGBUokOMLAEYmsO0zhAG6AZmO3D5KkW0qmymXJ3U2
-xqrzlHVhErEOo2vbUlMDUfphoditWS9IQKNCso7pAgMBAAGjggFWMIIBUjAJBgNV
-HRMEAjAAMBEGCWCGSAGG+EIBAQQEAwIGQDAzBglghkgBhvhCAQ0EJhYkT3BlblNT
-TCBHZW5lcmF0ZWQgU2VydmVyIENlcnRpZmljYXRlMB0GA1UdDgQWBBRA5HOWNIhD
-XkdfpGLagJJ0zs2yBTB8BgNVHSMEdTBzgBRHWyJnNZkcrJiaP6t6lNTZUyOCD6FX
-pFUwUzEQMA4GA1UEAwwHUm9vdCBDQTEQMA4GA1UECgwHaU1vdmllczELMAkGA1UE
-BhMCQ0gxDzANBgNVBAgMBlp1cmljaDEPMA0GA1UEBwwGWnVyaWNoggIQADAOBgNV
-HQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwOwYDVR0fBDQwMjAwoC6g
-LIYqaHR0cDovLzEyNy4wLjAuMTo1MDAwL2ludGVybWVkaWF0ZS5jcmwucGVtMA0G
-CSqGSIb3DQEBCwUAA4ICAQCD07+65HF4kZE4T+GroY/ZDD7Zt73rvqko6i0Im2/Q
-cFuvjajw0t5cDnY9ayKb09dByiKABPMDl5CEObDHAG2LklcXIeBunAAAKXy6AtLd
-R7u+ODA0IjBMCxlHnLTeeeAJo7Dv8f+IfDmgyHTlURUBs2t82kYveg8arIvWtgLP
-LDd2JPnX3Jg70YHy4yc+W71Z4jfjQbbGLHOfGRDYccIEy5K2emwidT4EtiauTgob
-VfS01nnmqXRymrSzWI9n6qNzgBm16yDbaa+pEhWO0ha287jL+vgbLGPH5Re6qMGd
-lC5NiXRQQfKU+LYmhWrbgUh5RSEYXxJVsq8x45Yk3CLqfQOvUUC8vUKTLaYpDHTg
-nzPDyOH3zaHTaagDocvxZ/U6bE1v0tujZo9mC+er3u9TK2pC0ty9kjCc/QeEiSVv
-m2KXKCWhSjGsqOXj/1vcUAop6LbYSjKh0/NHCugrNNvgqIkF5Wb2ZgYJ9ng5ix8k
-d9WW73fGeg3dKmI4ktUnNN8or1iB2Ghz4ohDp4CDpF5zLaUs2oLicA94vp3wg3vF
-LjNyDGNcBwlC0ClSvGouv5TQ+AJdfUKeeWnxNx8okGrA0CY4+tiQFLQD3s/WmbDp
-7R1OxgWDMmknqLikG58lc/hkNkAh6A0aoXkBUL9dH/Qr0EUGwgWfgsYnjM9+oSzd
-CQ==
------END CERTIFICATE-----
-"""
-
-ca_server = Ca_Server()
-#ca_server.verify_certificate(cert_rev)
-#print(ca_server.get_certificate_subject("1013"))
-#ca_server.generate_user_certificate(user_data)
-#print(ca_server.revoke_certificate(4100))
-#serial, pkcs12 = ca_server.generate_user_certificate("waeny", user_data)
-#print(serial, pkcs12)

@@ -157,34 +157,7 @@ def main(args):
             return Privilege.USER
         else:
             return Privilege.NONE
-
-    def _generate_config(user_id, first_name, last_name, email):
-        config = f"""
-        FQDN = www.iMovies.ch
-        ORGNAME = iMovies
-        ALTNAMES = DNS:$FQDN
-
-        # --- no modifications required below ---
-        [ req ]
-        default_bits = 2048
-        default_md = sha256
-        prompt = no
-        encrypt_key = no
-        distinguished_name = dn
-        req_extensions = req_ext
-
-        [ dn ]
-        C = CH
-        O = $ORGNAME
-        CN = {first_name} {last_name}
-        emailAddress = {email}
-        
-        [ req_ext ]
-        subjectAltName = $ALTNAMES
-        """
-        
-        return config
-
+            
     #####
     # RESPONSES
     #####
