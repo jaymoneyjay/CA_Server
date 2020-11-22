@@ -14,22 +14,23 @@ First set up the chain of trust by running the following command. As SECRET you 
 ./set_up_ca.sh root.cnf intermediate.cnf <SECRET>
 ```
 
-This createds a hidden file $\texttt{.env}$ which contains an $\texttt{api-key}$ and $\texttt{api-pass}$ both of which have to be included in $\texttt{https}$ headers to authenticate successfully to the API:
+This creates the needed certificates and API credentials used for authentication:
 
 ```bash
-Auth_Key: <<api-key>>
-Auth_Pass: <<api-pass>>
+Auth-Key: <API_CLIENT_KEY>
+Auth-Pass: <API_CLIENT_PASS>
 Content-Type: application/json
 ```
-
-The certificates for the CA server and the Web server are created automatically.
-The respective paths can be found in the .env file:
-
+Create a `.env` file in the app's root directory with the following contents (with filling in the generated data from the previous step)
+:
  ```bash
- # CA Server Certificate path:
-CA_SERVER_CERT_PATH=<<cert path>>
-# Web Server Certificate path:
-WEB_SERVER_CERT_PATH=<<cert path>>
+LISTEN="0.0.0.0"
+PORT=5000
+SSL_KEY_FILE="ssl.key.pem"
+SSL_CERT_FILE="ssl.cert.pem"
+LOGFILE="ca_server.log"
+API_CLIENT_KEY="<API_CLIENT_KEY>"
+API_CLIENT_PASS="<API_CLIENT_PASS>"
  ```
 
 
